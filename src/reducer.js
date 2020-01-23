@@ -1,4 +1,4 @@
-import {todoAPI} from "./api/api";
+import {tasksAPI, todoAPI} from "./api/api";
 const SET_TODOLIST = "SET_TODOLIST";
 const ADD_TODOLIST = "ADD_TODOLIST";
 const DELL_TODOLIST = "DELL_TODOLIST";
@@ -173,10 +173,9 @@ export const changeFilterValueAC = (filter) => ({type: CHANGE_FILTER, filter});
 
 export const setTodolistThunk = () => {
     return async (dispatch) => {
-      await todoAPI.getTodolist().then(response => {
-            if (response.statusText === "OK") {
-                dispatch(setTodolistAC(response.data))
-            } else  console.log('Error set todolist');
+        await todoAPI.getTodolist().then(response => {
+            dispatch(setTodolistAC(response.data))
+
         })
     }
 }
@@ -193,21 +192,49 @@ export const addTodolistThunk = (newTodoTitle) => {
 
 export const deleteTodolistThunk = (id) => {
     return async (dispatch) => {
-       await todoAPI.deleteTodolist(id).then(response => {
-            if (response.statusText === "OK") {
-                dispatch(deleteTodolist(id))
-            } else  console.log('Error delete todolist');
+        await todoAPI.deleteTodolist(id).then(response => {
+            dispatch(deleteTodolist(id))
         })
     }
 }
 
 export const changeTodolistTitleThunk = (id, title) => {
     return async (dispatch) => {
-       await todoAPI.updateTodolist(id, title);
+        await todoAPI.updateTodolist(id, title);
+    }
+}
+
+export const getTasksThunk = (idTodolist, tasks) => {
+    return async (dispatch) => {
+        await tasksAPI.getTasks(idTodolist).then(response => {
+            dispatch(setTasksAC(idTodolist, response.data.items))
+        })
+    }
+}
+export const addTasksThunk = (idTodolist, newTask) => {
+    return async (dispatch) => {
+        await tasksAPI.addTask(idTodolist, newTask).then(response => {
+            dispatch(addTaskAC(idTodolist,  response.data))
+        })
     }
 }
 
 
+export const deleteTaskThunk = (idTodo, taskId) => {
+    return async (dispatch) => {
+        await tasksAPI.deleteTask(idTodo, taskId).then(response => {
+            dispatch(deleteTaskAc(idTodo, taskId))
+        })
+    }
+}
+
+export const changeTaskThunk = (idTodo, taskId, task) => {
+    return async (dispatch) => {
+        await tasksAPI.updateTask(idTodo, taskId, task).then(response => {
+           dispatch(setTaskInCurrentTodolistAC(idTodo, taskId, response.data))
+        })
+    }
+}
 
 
 export default reducer;

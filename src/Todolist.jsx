@@ -1,14 +1,10 @@
 import React from 'react';
 import {connect} from "react-redux";
 import {
-    addTaskAC,
     changeTodoTitleAC,
-    deleteTodolist,
-    setTasksAC,
-    setTodolistAC,
-    deleteTaskAc,
     changeTaskAC,
-    setTaskInCurrentTodolistAC, changeFilterValueAC, deleteTodolistThunk, changeTodolistTitleThunk
+    setTaskInCurrentTodolistAC, changeFilterValueAC, deleteTodolistThunk, changeTodolistTitleThunk, getTasksThunk,
+    addTasksThunk, deleteTaskThunk, changeTaskThunk
 } from "./reducer";
 import TodolistsTitle from "./TodolistsTitle";
 import axios from "axios/index";
@@ -22,49 +18,36 @@ class Todolist extends React.Component {
     componentDidMount() {
         this._restoreState()
     }
-
     _restoreState = () => {
-        return tasksAPI.getTasks(this.props.id).then(response => {
-            this.props.setTasks(this.props.id, response.data.items)
-        }).catch(() => {
-            console.log('Error get all todolists tasks');
-        })
-    }
-    addNewTask = (newTask) => {
-        return tasksAPI.addTask(this.props.id, newTask).then(response => {
-            this.props.addTaskInTodolist(this.props.id, response.data)
-        }).catch(() => {
-            console.log('Error add task in todolist');
-        })
+       this.props.setTasks(this.props.id,this.props.tasks)
     }
 
     deleteTodolist = (id) => {
         this.props.dellTodo(id)
     }
     updateTodoTitle = (id, title) => {
-        this.props.updateTodolistTitle(id, title)
+        this.props.updateTodolistTitleServer(id, title)
     }
     changeTodoTitle = (id, title) => {
         this.props.updateTodolistTitleLocal(id, title)
     }
+    addNewTask = (newTask) => {
+        this.props.addTaskInTodolist(this.props.id,newTask)
+    }
 
     deleteTask = (idTodo, taskId) => {
-        return tasksAPI.deleteTask(idTodo, taskId).then(response => {
-            this.props.deleteTask(idTodo, taskId)
-        }).catch(() => {
-            console.log('Error delete tasks');
-        })
+        this.props.deleteTask(idTodo, taskId)
     }
+
     changeTaskInTodolist = (idTodo, taskId, task) => {
-        return tasksAPI.updateTask(idTodo, taskId, task).then(response => {
-            this.props.setTaskInCurrentTodo(idTodo, taskId, response.data)
-        }).catch(() => {
-            console.log('Error delete tasks');
-        })
+      this.props.setTaskInCurrentTodoServer(idTodo, taskId, task)
     }
     updateTaskInTodolist = (idTodo, idTask, newTitleTask) => {
-        this.props.updateTask(idTodo, idTask, newTitleTask);
+        this.props.updateTaskLocal(idTodo, idTask, newTitleTask);
     }
+
+
+
     changeFilterValue = (newFilterValue) => {
         this.props.changeFilter(newFilterValue.currentTarget.value)
     }
@@ -103,13 +86,13 @@ let mapStateToProps = (state) => {
 
 let mapDispatchToProps = (dispatch) => {
     return {
-        setTasks(todoId, tasks) {
-            dispatch(setTasksAC(todoId, tasks))
+        setTasks(idTodolist,tasks) {
+            dispatch(getTasksThunk(idTodolist,tasks))
         },
         dellTodo(id){
             dispatch(deleteTodolistThunk(id))
         },
-        updateTodolistTitle(idTodo, title){
+        updateTodolistTitleServer(idTodo, title){
             dispatch(changeTodolistTitleThunk(idTodo, title))
         },
         updateTodolistTitleLocal(idTodo, title){
@@ -117,16 +100,16 @@ let mapDispatchToProps = (dispatch) => {
         },
 
         addTaskInTodolist(todoId, task){
-            dispatch(addTaskAC(todoId, task))
+            dispatch(addTasksThunk(todoId, task))
         },
         deleteTask(todoId, taskId){
-            dispatch(deleteTaskAc(todoId, taskId))
+            dispatch(deleteTaskThunk(todoId, taskId))
         },
-        updateTask(idTodo, idTask, title){
+        updateTaskLocal(idTodo, idTask, title){
             dispatch(changeTaskAC(idTodo, idTask, title))
         },
-        setTaskInCurrentTodo(idTodo, idTask, task){
-            dispatch(setTaskInCurrentTodolistAC(idTodo, idTask, task))
+        setTaskInCurrentTodoServer(idTodo, idTask, task){
+            dispatch(changeTaskThunk(idTodo, idTask, task))
         },
         changeFilter(filter){
             dispatch(changeFilterValueAC(filter))

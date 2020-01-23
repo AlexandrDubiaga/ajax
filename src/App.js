@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import {connect} from "react-redux";
 import axios from "axios";
-import {addTodolistAC, setTodolistAC, addTodolistThunk, setTodolistThunk} from "./reducer";
+import {addTodolistAC, setTodolistAC, addTodolistThunk, setTodolistThunk, deleteTodolistThunk} from "./reducer";
 import Todolist from "./Todolist";
 import AddItem from "./AddItem";
 import {todoAPI} from "./api/api";
