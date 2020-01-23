@@ -116,26 +116,6 @@ let reducer = (state = initialState, action) => {
                 })
             }
         }
-        case SET_TASK_IN_CURRENT_TODOLIST: {
-            return {
-                ...state,
-                todolists: state.todolists.map(tl => {
-                    if (tl.id === action.todoId) {
-                        return {
-                            ...tl,
-                            tasks: [...tl.tasks.map(task => {
-                                if (task.id === action.taskId) {
-                                    return {
-                                        ...action.task.data.item
-                                    }
-                                }
-                                return task
-                            })]
-                        }
-                    } else return tl
-                })
-            }
-        }
 
         case CHANGE_FILTER: {
             return {
@@ -161,13 +141,6 @@ export const setTasksAC = (todoId, tasks) => ({type: SET_TASKS, todoId, tasks});
 export const addTaskAC = (todoId, task) => ({type: ADD_TASK, todoId, task});
 export const deleteTaskAc = (todoId, taskId) => ({type: DELL_TASK, todoId, taskId});
 export const changeTaskAC = (todoId, taskId, task) => ({type: CHANGE_TASK, todoId, taskId, task});
-export const setTaskInCurrentTodolistAC = (todoId, taskId, task) => ({
-    type: SET_TASK_IN_CURRENT_TODOLIST,
-    todoId,
-    taskId,
-    task
-});
-
 export const changeFilterValueAC = (filter) => ({type: CHANGE_FILTER, filter});
 
 
@@ -179,7 +152,6 @@ export const setTodolistThunk = () => {
         })
     }
 }
-
 export const addTodolistThunk = (newTodoTitle) => {
     return async (dispatch) => {
         await todoAPI.addTodolist(newTodoTitle).then(response => {
@@ -189,7 +161,6 @@ export const addTodolistThunk = (newTodoTitle) => {
         })
     }
 }
-
 export const deleteTodolistThunk = (id) => {
     return async (dispatch) => {
         await todoAPI.deleteTodolist(id).then(response => {
@@ -197,12 +168,12 @@ export const deleteTodolistThunk = (id) => {
         })
     }
 }
-
 export const changeTodolistTitleThunk = (id, title) => {
     return async (dispatch) => {
         await todoAPI.updateTodolist(id, title);
     }
 }
+
 
 export const getTasksThunk = (idTodolist, tasks) => {
     return async (dispatch) => {
@@ -214,7 +185,7 @@ export const getTasksThunk = (idTodolist, tasks) => {
 export const addTasksThunk = (idTodolist, newTask) => {
     return async (dispatch) => {
         await tasksAPI.addTask(idTodolist, newTask).then(response => {
-            dispatch(addTaskAC(idTodolist,  response.data))
+            dispatch(addTaskAC(idTodolist, response.data))
         })
     }
 }
@@ -229,12 +200,31 @@ export const deleteTaskThunk = (idTodo, taskId) => {
 }
 
 export const changeTaskThunk = (idTodo, taskId, task) => {
-    return async (dispatch) => {
-        await tasksAPI.updateTask(idTodo, taskId, task).then(response => {
-           dispatch(setTaskInCurrentTodolistAC(idTodo, taskId, response.data))
+    return async (dispatch, getState) => {
+        getState().todolists.find(tl => tl.id === idTodo).tasks.forEach(t => {
+            if (t.id === taskId) {
+                tasksAPI.updateTask(idTodo, taskId, {...t, ...task}).then(response => {
+                    dispatch(changeTaskAC(idTodo, taskId, response.data.data.item))
+                })
+            }
         })
+
     }
 }
+/*
+ export const getTasksThunk = (idTodolist, tasks) => async dispatch => await tasksAPI.getTasks(idTodolist).then(response => dispatch(setTasksAC(idTodolist, response.data.items)))
+ export const addTasksThunk = (idTodolist, newTask) => async dispatch => await tasksAPI.addTask(idTodolist, newTask).then(response =>dispatch(addTaskAC(idTodolist, response.data)))
+ export const deleteTaskThunk = (idTodo, taskId) => async dispatch => await tasksAPI.deleteTask(idTodo, taskId).then(response => dispatch(deleteTaskAc(idTodo, taskId)))
+ export const changeTaskThunk = (idTodo, taskId, task) => async dispatch => await tasksAPI.updateTask(idTodo, taskId, task).then(response => dispatch(setTaskInCurrentTodolistAC(idTodo, taskId, response.data)))
+
+
+ export const setTodolistThunk = () => async dispatch  => await todoAPI.getTodolist().then(response => dispatch(setTodolistAC(response.data)));
+ export const addTodolistThunk = newTodoTitle => async dispatch => await todoAPI.addTodolist(newTodoTitle).then(response => dispatch(addTodolistAC(response.data.data.item)));
+ export const deleteTodolistThunk = id => async dispatch => await todoAPI.deleteTodolist(id).then(response => dispatch(deleteTodolist(id)));
+ export const changeTodolistTitleThunk = (id, title) => async dispatch => await todoAPI.updateTodolist(id, title);
+
+
+ */
 
 
 export default reducer;
