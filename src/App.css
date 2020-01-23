@@ -1,0 +1,35 @@
+.App {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.TodoList {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    width: 400px;
+}
+.TodoTitle{
+    color: blue;
+    font-weight: bold;
+}
+.OneTask{
+    margin-bottom:5px;
+}
+.All{
+    color: white;
+    background-color: cornflowerblue;
+}
+.Completed{
+    color: white;
+    background-color: sienna;
+}
+.Active{
+    color: forestgreen;
+    background-color: lemonchiffon;
+}
+.New{
+    color: skyblue;
+    background-color: green;
+}
