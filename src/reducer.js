@@ -75,7 +75,6 @@ let reducer = (state = initialState, action) => {
                         }
                     } else return tl
                 })
-
             }
         }
 
@@ -219,7 +218,6 @@ export const addTasksThunk = (idTodolist, newTask) => {
     }
 }
 
-
 export const deleteTaskThunk = (idTodo, taskId) => {
     return async (dispatch) => {
         await tasksAPI.deleteTask(idTodo, taskId).then(response => {
@@ -231,7 +229,7 @@ export const deleteTaskThunk = (idTodo, taskId) => {
 export const changeTaskThunk = (idTodo, taskId, task) => {
     return async (dispatch) => {
         await tasksAPI.updateTask(idTodo, taskId, task).then(response => {
-           dispatch(setTaskInCurrentTodolistAC(idTodo, taskId, response.data))
+           dispatch(setTaskInCurrentTodolistAC(idTodo, taskId, response.data));
         })
     }
 }
